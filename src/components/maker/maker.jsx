@@ -1,4 +1,4 @@
-import React,{ useEffect,useState } from 'react';
+import React,{ useEffect,useState,useCallback } from 'react';
 import styles              from './maker.module.css';
 import Header              from "../header/header";
 import Footer              from "../footer/footer";
@@ -14,9 +14,9 @@ const Maker = ({FileInput,authService,cardRepository}) => {
     const [cards,setCards] = useState({})
     const history = useHistory();
 
-    const onLogout = ()=>{
+    const onLogout = useCallback(() => {
         authService.logout();
-    }
+    },[authService])
 
 
     // Mount, Id 변경시
@@ -30,7 +30,7 @@ const Maker = ({FileInput,authService,cardRepository}) => {
 
         return () => stopSync();
 
-    },[userId])
+    },[userId,cardRepository])
 
     // 로그인 시
     useEffect(()=>{

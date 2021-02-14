@@ -1,24 +1,32 @@
-import firebase    from 'firebase';
-import firebaseApp from "./firebase";
+import { firebaseAuth, githubProvider, googleProvider } from "./firebase";
 
 class Auth_service {
+    getProvider(providerName){
+        switch (providerName){
+            case 'Google':
+                return googleProvider;
+            case 'Github':
+                return githubProvider;
+            default:
+                throw new Error(`not supported provider ${providerName}`)
+        }
+    }
+
     login(providerName){
-        const authProvider = new firebase.auth[`${providerName}AuthProvider`]();
-        return firebaseApp.auth().signInWithPopup(authProvider);
+        // const authProvider = new firebase.auth[`${providerName}AuthProvider`]();
+        const authProvider = this.getProvider(providerName);
+        return firebaseAuth.signInWithPopup(authProvider);
     }
 
     loginSendMail(email,actionCodeSettings){
-        firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
+        firebaseAuth.sendSignInLinkToEmail(email, actionCodeSettings)
             .then(() => {
-                // The link was successfully sent. Inform the user.
-                // Save the email locally so you don't need to ask the user for it again
-                // if they open the link on the same device.
                 window.localStorage.setItem('emailForSignIn', email);
                 // ...
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
+                console.log('Mail Send Error');
+                console.log(error);
                 // ...
             });
 
@@ -26,13 +34,13 @@ class Auth_service {
 
     CodeCheckMail(){
         // Confirm the link is a sign-in with email link.
-        if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+        if (firebaseAuth.isSignInWithEmailLink(window.location.href)) {
             var email = window.localStorage.getItem('emailForSignIn');
             if (!email) {
                 return false;
                 // email = window.prompt('Please provide your email for confirmation');
             }
-            firebase.auth().signInWithEmailLink(email, window.location.href)
+            firebaseAuth.signInWithEmailLink(email, window.location.href)
                 .then((result) => {
                     window.localStorage.removeItem('emailForSignIn');
                 })
@@ -42,11 +50,11 @@ class Auth_service {
     }
 
     logout(){
-        firebase.auth().signOut();
+        firebaseAuth.signOut();
     }
 
     onAuthChange(onUserChanged){
-        firebase.auth().onAuthStateChanged(user=>{
+        firebaseAuth.onAuthStateChanged(user=>{
             onUserChanged(user);
         })
     }
