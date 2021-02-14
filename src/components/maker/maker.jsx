@@ -7,10 +7,10 @@ import Editor              from "../editor/editor";
 import Preview             from "../preview/preview";
 
 
-const Maker = ({authService}) => {
+const Maker = ({FileInput,authService}) => {
 
-    const [cards,setCards] = useState([
-        {
+    const [cards,setCards] = useState({
+        '1':{
             id:'1',
             name:'June',
             company:'Plani',
@@ -21,7 +21,7 @@ const Maker = ({authService}) => {
             fileName:'테스트..',
             fileURL:'테스트...png',
         },
-        {
+        '2':{
             id:'2',
             name:'June2',
             company:'Plani',
@@ -32,7 +32,7 @@ const Maker = ({authService}) => {
             fileName:'테스트..',
             fileURL:null,
         },
-        {
+        '3':{
             id:'3',
             name:'June3',
             company:'Plani',
@@ -43,7 +43,11 @@ const Maker = ({authService}) => {
             fileName:'테스트..',
             fileURL:null,
         }
-    ])
+    })
+
+
+
+
     const history = useHistory();
 
     const onLogout = ()=>{
@@ -58,16 +62,31 @@ const Maker = ({authService}) => {
         })
     })
 
-    const addCard = (card) => {
-        const update = [...cards,card]
-        setCards(update);
+    // const addCard = (card) => {
+    //     const update = [...cards,card]
+    //     setCards(update);
+    // }
+
+    const createOrUpdateCard = (card)=>{
+        setCards(cards=>{
+            const updated = {...cards}
+            updated[card.id] = card;
+            return updated;
+        })
+    }
+    const deleteCard = (card)=>{
+        setCards(cards=>{
+            const updated = {...cards}
+            delete updated[card.id];
+            return updated;
+        })
     }
 
     return (
         <section className={styles.maker}>
             <Header onLogout={onLogout} />
             <div className={styles.container}>
-                <Editor cards={cards} addCard={addCard} />
+                <Editor FileInput={FileInput} cards={cards} addCard={createOrUpdateCard} updateCard={createOrUpdateCard} deleteCard={deleteCard} />
                 <Preview cards={cards} />
 
             </div>
